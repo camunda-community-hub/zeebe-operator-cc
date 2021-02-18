@@ -123,13 +123,13 @@ func workerPollCCClusters(mgr ctrl.Manager) {
 						Name:      c.Name,
 						Namespace: "default",
 					},
-					Status: zeebev1.ZeebeClusterStatus{
+					Spec: zeebev1.ZeebeClusterSpec{
+						Owner:     "CC",
+						Track:     true,
 						ClusterId: c.ID,
-						ClusterStatus: cc.ClusterStatus{
-							Ready: "Fetching",
-						},
 					},
 				}
+				setupLog.Info("Creating Cluster: ", "ZeebeCluster: ", zeebeCluster)
 				err := mgr.GetClient().Create(ctx, &zeebeCluster)
 				if err != nil {
 					setupLog.Error(err, "Error Creating ZeebeCluster: "+c.Name)

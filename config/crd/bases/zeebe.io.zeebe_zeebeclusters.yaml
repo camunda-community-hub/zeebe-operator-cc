@@ -33,16 +33,23 @@ spec:
           type: object
         spec:
           description: ZeebeClusterSpec defines the desired state of ZeebeCluster
+          properties:
+            clusterId:
+              type: string
+            owner:
+              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                Important: Run "make" to regenerate code after modifying this file'
+              type: string
+            track:
+              type: boolean
           type: object
         status:
           description: ZeebeClusterStatus defines the observed state of ZeebeCluster
           properties:
-            clusterId:
+            clusterStatus:
               description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
                 of cluster Important: Run "make" to regenerate code after modifying
                 this file'
-              type: string
-            clusterStatus:
               properties:
                 operateStatus:
                   type: string
@@ -68,7 +75,6 @@ spec:
               - zeebeUrl
               type: object
           required:
-          - clusterId
           - clusterStatus
           type: object
       type: object

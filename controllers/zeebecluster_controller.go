@@ -121,34 +121,28 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		return reconcile.Result{}, nil
 	}
 	// Create cluster if resource doesn't provide a cluster Id
-	if zeebeCluster.Status.ClusterId == "" {
+	log.Info("Checking Cluster ID for Creating Cluster Before Creation: " + zeebeCluster.Spec.ClusterId + "Owner : " + zeebeCluster.Spec.Owner)
+	if zeebeCluster.Spec.ClusterId == "" && zeebeCluster.Spec.Owner != "CC" {
+		log.Info("Creating Cluster: " + zeebeCluster.Spec.ClusterId)
+
 		clusterId, err := cc.CreateCluster(req.NamespacedName.Name)
 		if err != nil {
 			log.Error(err, "failed to create cluster")
 			return reconcile.Result{}, err
 		}
 		log.Info("Updating Zeebe Cluster with: ", "ClusterId", clusterId)
-		zeebeCluster.Status.ClusterId = clusterId
+		zeebeCluster.Spec.ClusterId = clusterId
 
-		if err := r.Status().Update(context.Background(), &zeebeCluster); err != nil {
+		if err := r.Update(context.Background(), &zeebeCluster); err != nil {
 			return reconcile.Result{}, err
 		}
 	}
-	// if there is a cluster id poll for state
-	if zeebeCluster.Status.ClusterId != "" {
-		go workerPollCCClusterDetails(zeebeCluster.Status.ClusterId, r, zeebeCluster)
-	}
 
-	//if zeebeCluster.Status.ClusterId != "" {
-	//	clusterStatus, err := r.WaitForClusterStateChange(zeebeCluster.Status.ClusterId, zeebeCluster.Status.ClusterStatus)
-	//	if err != nil {
-	//		return reconcile.Result{}, err
-	//	}
-	//	zeebeCluster.Status.ClusterStatus = clusterStatus
-	//	if err := r.Status().Update(context.Background(), &zeebeCluster); err != nil {
-	//		return reconcile.Result{}, err
-	//	}
-	//}
+	log.Info("Checking  for registering workers: ", "Cluster ID", zeebeCluster.Spec.ClusterId, " Tracking on: ", zeebeCluster.Spec.Track)
+	if zeebeCluster.Spec.ClusterId != "" {
+		log.Info("Registering worker to check cluster status: " + zeebeCluster.Spec.ClusterId)
+		go workerPollCCClusterDetails(zeebeCluster.Spec.ClusterId, r, zeebeCluster)
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -193,7 +187,7 @@ func (r *ZeebeClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func (r *ZeebeClusterReconciler) deleteExternalDependency(zeebeCluster *zeebev1.ZeebeCluster) error {
 	log.Printf("Trying to delete the cluster in camunda cloud")
 
-	deleted, err := cc.DeleteCluster(zeebeCluster.Status.ClusterId)
+	deleted, err := cc.DeleteCluster(zeebeCluster.Spec.ClusterId)
 	if err != nil {
 		log.Fatal(err, "Failed to delete cluster")
 	}

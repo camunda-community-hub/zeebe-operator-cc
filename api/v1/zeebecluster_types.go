@@ -27,14 +27,18 @@ import (
 type ZeebeClusterSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-
+	// +kubebuilder:validation:Optional
+	Owner string `json:"owner"`
+	// +kubebuilder:validation:Optional
+	Track bool `json:"track"`
+	// +kubebuilder:validation:Optional
+	ClusterId string `json:"clusterId"`
 }
 
 // ZeebeClusterStatus defines the observed state of ZeebeCluster
 type ZeebeClusterStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	ClusterId     string           `json:"clusterId"`
 	ClusterStatus cc.ClusterStatus `json:"clusterStatus"`
 }
 
