@@ -24,7 +24,10 @@ import (
 	"log"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
 
 	zeebev1 "zeebe.io/m/v2/api/v1"
@@ -117,8 +120,8 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		}
 		return reconcile.Result{}, nil
 	}
-
-	if zeebeCluster.Status.ClusterStatus.Ready == "" {
+	// Create cluster if resource doesn't provide a cluster Id
+	if zeebeCluster.Status.ClusterId == "" {
 		clusterId, err := cc.CreateCluster(req.NamespacedName.Name)
 		if err != nil {
 			log.Error(err, "failed to create cluster")
@@ -127,28 +130,64 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		log.Info("Updating Zeebe Cluster with: ", "ClusterId", clusterId)
 		zeebeCluster.Status.ClusterId = clusterId
 
-		if err := r.Update(context.Background(), &zeebeCluster); err != nil {
+		if err := r.Status().Update(context.Background(), &zeebeCluster); err != nil {
 			return reconcile.Result{}, err
 		}
 	}
+	// if there is a cluster id poll for state
 	if zeebeCluster.Status.ClusterId != "" {
-		clusterStatus, err := r.WaitForClusterStateChange(zeebeCluster.Status.ClusterId, zeebeCluster.Status.ClusterStatus)
-		if err != nil {
-			return reconcile.Result{}, err
-		}
-		zeebeCluster.Status.ClusterStatus = clusterStatus
-		if err := r.Update(context.Background(), &zeebeCluster); err != nil {
-			return reconcile.Result{}, err
-		}
+		go workerPollCCClusterDetails(zeebeCluster.Status.ClusterId, r, zeebeCluster)
 	}
+
+	//if zeebeCluster.Status.ClusterId != "" {
+	//	clusterStatus, err := r.WaitForClusterStateChange(zeebeCluster.Status.ClusterId, zeebeCluster.Status.ClusterStatus)
+	//	if err != nil {
+	//		return reconcile.Result{}, err
+	//	}
+	//	zeebeCluster.Status.ClusterStatus = clusterStatus
+	//	if err := r.Status().Update(context.Background(), &zeebeCluster); err != nil {
+	//		return reconcile.Result{}, err
+	//	}
+	//}
 
 	return ctrl.Result{}, nil
 }
 
+var events = make(chan event.GenericEvent)
+
+func workerPollCCClusterDetails(clusterId string, r *ZeebeClusterReconciler, zeebeCluster zeebev1.ZeebeCluster) {
+
+	ticker := time.NewTicker(10000 * time.Millisecond)
+
+	for {
+		select {
+		case <-ticker.C:
+			resp, err := cc.GetClusterDetails(clusterId)
+			if err != nil {
+				r.Log.Error(err, "fetching cluster status details failed...")
+			}
+			r.Log.Info("Worker ("+clusterId+")", "ClusterId: ", clusterId, "Cluster Name: ",
+				zeebeCluster.Name, "Cluster Namespace", zeebeCluster.Namespace, "Cluster State: ", resp.Ready)
+			zeebeCluster.Status.ClusterStatus = resp
+			if err := r.Status().Update(context.Background(), &zeebeCluster); err != nil {
+				r.Log.Error(err, "failed to update cluster status")
+			} else {
+				r.Log.Info("Status updated for", "clusterId", clusterId, "status", zeebeCluster.Status.ClusterStatus)
+			}
+		}
+	}
+
+}
+
 func (r *ZeebeClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&zeebev1.ZeebeCluster{}).
-		Complete(r)
+
+	controller, err := ctrl.NewControllerManagedBy(mgr).For(&zeebev1.ZeebeCluster{}).Build(r)
+
+	controller.Watch(
+		&source.Channel{Source: events},
+		&handler.EnqueueRequestForObject{},
+	)
+	return err
 }
 
 func (r *ZeebeClusterReconciler) deleteExternalDependency(zeebeCluster *zeebev1.ZeebeCluster) error {

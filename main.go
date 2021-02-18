@@ -20,6 +20,7 @@ import (
 	cc "github.com/salaboy/camunda-cloud-go-client/pkg/cc/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
+	"time"
 
 	"context"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -88,30 +89,8 @@ func main() {
 		setupLog.Info("Retrieving Cluster Plans ...")
 		cc.GetClusterParams()
 		setupLog.Info("Retrieving Cluster Plans Done! ")
-		clusters, err := cc.GetClusters()
-		if err != nil {
-			setupLog.Error(err, "failed to get clusters")
-		}
-		setupLog.Info("reported clusters", "Clusters: ", clusters)
-		for _, c := range clusters {
-			ctx := context.Background()
-			var zeebeCluster = zeebev1.ZeebeCluster{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      c.Name,
-					Namespace: "default",
-				},
-				Status: zeebev1.ZeebeClusterStatus{
-					ClusterId: c.ID,
-					ClusterStatus: cc.ClusterStatus{
-						Ready: "Fetching",
-					},
-				},
-			}
-			err := mgr.GetClient().Create(ctx, &zeebeCluster)
-			if err != nil {
-				setupLog.Error(err, "Error Creating ZeebeCluster: "+c.Name)
-			}
-		}
+
+		go workerPollCCClusters(mgr)
 
 	} else {
 		setupLog.Info("Error login in!")
@@ -121,6 +100,42 @@ func main() {
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
+	}
+
+}
+
+func workerPollCCClusters(mgr ctrl.Manager) {
+	ticker := time.NewTicker(10000 * time.Millisecond)
+	// todo check if the cluster already exist
+	for {
+		select {
+		case <-ticker.C:
+
+			clusters, err := cc.GetClusters()
+			if err != nil {
+				setupLog.Error(err, "failed to get clusters")
+			}
+			setupLog.Info("reported clusters", "Clusters: ", clusters)
+			for _, c := range clusters {
+				ctx := context.Background()
+				var zeebeCluster = zeebev1.ZeebeCluster{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      c.Name,
+						Namespace: "default",
+					},
+					Status: zeebev1.ZeebeClusterStatus{
+						ClusterId: c.ID,
+						ClusterStatus: cc.ClusterStatus{
+							Ready: "Fetching",
+						},
+					},
+				}
+				err := mgr.GetClient().Create(ctx, &zeebeCluster)
+				if err != nil {
+					setupLog.Error(err, "Error Creating ZeebeCluster: "+c.Name)
+				}
+			}
+		}
 	}
 
 }

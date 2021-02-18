@@ -13,6 +13,8 @@ spec:
     plural: zeebeclusters
     singular: zeebecluster
   scope: ""
+  subresources:
+    status: {}
   validation:
     openAPIV3Schema:
       description: ZeebeCluster is the Schema for the zeebeclusters API
