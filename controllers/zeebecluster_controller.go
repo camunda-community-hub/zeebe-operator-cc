@@ -125,7 +125,7 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	if zeebeCluster.Spec.ClusterId == "" && zeebeCluster.Spec.Owner != "CC" {
 		log.Info("Creating Cluster: " + zeebeCluster.Spec.ClusterId)
 
-		clusterId, err := cc.CreateCluster(req.NamespacedName.Name)
+		clusterId, err := cc.CreateClusterDefault(req.NamespacedName.Name)
 		if err != nil {
 			log.Error(err, "failed to create cluster")
 			return reconcile.Result{}, err
