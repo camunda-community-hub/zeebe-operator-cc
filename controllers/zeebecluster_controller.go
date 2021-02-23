@@ -89,7 +89,8 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	err := r.Get(ctx, req.NamespacedName, &zeebeCluster)
 	if err != nil {
 		// handle error
-		log.Error(err, "Failed to get Zeebe Cluster")
+		// The cluster doesn't exist.. NOOP
+		//log.Error(err, "Failed to get Zeebe Cluster")
 	}
 	// name of your custom finalizer
 	myFinalizerName := "zeebecluster.cloud.camunda.com"
