@@ -17,8 +17,9 @@ package controllers
 
 import (
 	"context"
+	cc "github.com/camunda-community-hub/camunda-cloud-go-client/pkg/cc/client"
 	"github.com/go-logr/logr"
-	cc "github.com/salaboy/camunda-cloud-go-client/pkg/cc/client"
+	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"log"
@@ -162,11 +163,15 @@ func workerPollCCClusterDetails(clusterId string, r *ZeebeClusterReconciler, zee
 			}
 			r.Log.Info("Worker ("+clusterId+")", "ClusterId: ", clusterId, "Cluster Name: ",
 				zeebeCluster.Name, "Cluster Namespace", zeebeCluster.Namespace, "Cluster State: ", resp.Ready)
-			zeebeCluster.Status.ClusterStatus = resp
-			if err := r.Status().Update(context.Background(), &zeebeCluster); err != nil {
-				r.Log.Error(err, "failed to update cluster status")
-			} else {
-				r.Log.Info("Status updated for", "clusterId", clusterId, "status", zeebeCluster.Status.ClusterStatus)
+			if diff := cmp.Diff(zeebeCluster.Status.ClusterStatus, resp); diff != "" {
+				r.Log.Info("Cluster " + zeebeCluster.Name + "  Status changed: " + diff)
+				zeebeCluster.Status.ClusterStatus = resp
+				if err := r.Status().Update(context.Background(), &zeebeCluster); err != nil {
+					//Status updated already...
+					//r.Log.Error(err, "failed to update cluster status")
+				} else {
+					r.Log.Info("Status updated for", "clusterId", clusterId, "status", zeebeCluster.Status.ClusterStatus)
+				}
 			}
 		}
 	}
@@ -186,13 +191,16 @@ func (r *ZeebeClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func (r *ZeebeClusterReconciler) deleteExternalDependency(zeebeCluster *zeebev1.ZeebeCluster) error {
 	log.Printf("Trying to delete the cluster in camunda cloud")
-
-	deleted, err := cc.DeleteCluster(zeebeCluster.Spec.ClusterId)
-	if err != nil {
-		log.Fatal(err, "Failed to delete cluster")
-	}
-	if deleted {
-		log.Printf("Cluster in camunda cloud deleted")
+	if zeebeCluster.Status.ClusterStatus.Ready != "Not Found" {
+		deleted, err := cc.DeleteCluster(zeebeCluster.Spec.ClusterId)
+		if err != nil {
+			log.Printf("Failed to delete cluster: cluster not found %s", err)
+		}
+		if deleted {
+			log.Printf("Cluster in camunda cloud deleted")
+		}
+	} else {
+		log.Printf("Cluster in Not Found State, nothing to delete remotely")
 	}
 
 	return nil

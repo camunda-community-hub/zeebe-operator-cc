@@ -1,7 +1,7 @@
 apiVersion: zeebe.io.zeebe/v1
 kind: ZeebeCluster
 metadata:
-  name: zeebecluster-sample
+  name: from-k8s 
 spec:
   # Add fields here
   foo: bar

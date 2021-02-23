@@ -16,7 +16,7 @@ limitations under the License.
 package v1
 
 import (
-	cc "github.com/salaboy/camunda-cloud-go-client/pkg/cc/client"
+	cc "github.com/camunda-community-hub/camunda-cloud-go-client/pkg/cc/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

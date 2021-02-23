@@ -17,7 +17,7 @@ package main
 
 import (
 	"flag"
-	cc "github.com/salaboy/camunda-cloud-go-client/pkg/cc/client"
+	cc "github.com/camunda-community-hub/camunda-cloud-go-client/pkg/cc/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"time"
@@ -132,7 +132,8 @@ func workerPollCCClusters(mgr ctrl.Manager) {
 				setupLog.Info("Creating Cluster: ", "ZeebeCluster: ", zeebeCluster)
 				err := mgr.GetClient().Create(ctx, &zeebeCluster)
 				if err != nil {
-					setupLog.Error(err, "Error Creating ZeebeCluster: "+c.Name)
+					setupLog.Info("Cluster " + zeebeCluster.Name + " already exist. NOOP")
+					//setupLog.Error(err, "Error Creating ZeebeCluster: "+c.Name)
 				}
 			}
 		}
