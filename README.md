@@ -15,6 +15,25 @@ The operator can be installed using helm or by building it locally and running i
 
 ## Helm 
 
+```
+helm repo add zeebe http://helm.zeebe.io
+helm repo update
+```
+
+The chart depends on a secret called `camunda-cloud-credentials` containing both the Cliend Id (cc-client-id) and Secret Id (cc-secret-id)
+You can create this secret by running
+
+```
+kubectl create secret generic camunda-cloud-credentials --from-literal=cc-client-id=<CLIENT_ID> --from-literal=cc-client-secret=<CLIENT_SECRET>
+```
+
+Then you can install the Operator chart:
+
+```
+helm install operator zeebe/zeebe-operator-cc
+```
+
+
 ## Build and run from source
 
 

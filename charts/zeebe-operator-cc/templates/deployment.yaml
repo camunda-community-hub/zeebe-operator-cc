@@ -39,6 +39,16 @@ spec:
         env:
         - name: VERSION
           value: {{ .Chart.Version }}
+        - name: CC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: camunda-cloud-credentials
+              key: cc-client-id
+        - name: CC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: camunda-cloud-credentials
+              key: cc-client-secret
 {{- range $pkey, $pval := .Values.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
