@@ -39,6 +39,11 @@ helm install operator zeebe/zeebe-operator-cc
 
 ## Build and run from source
 
+1) Git Clone the project
+2) Export CC_CLIENT_ID and CC_CLIENT_SECRET obtained from your Camunda Cloud account 
+3) Having kubectl connected to a kubernetes cluster you can run `make install` to install the custom CRD for ZeebeClusters
+4) Once the CRDs are present in the cluster you can run `make run` to start the operator
+
 
 # Operator Use Cases
 
@@ -49,7 +54,10 @@ How does this work?
 3) The `ZeebeCluster` resource created locally, provides all the details about the remote provisioned cluster, for other components to connect to it. 
 
 
-The Operator also implements a bi-directional sync. If enabled, when connecting to Camunda Cloud, it will create local resources to match existing Zeebe Clusters inside the Camunda Cloud account. 
+The Operator also implements a bi-directional sync. If enabled, when connecting to Camunda Cloud, it will create local resources to match existing Zeebe Clusters inside the Camunda Cloud account.
+
+![](imgs/camunda-cloud-zb-operator.png)
+
 
 # Future work
 
@@ -57,6 +65,6 @@ Unify helm chart deployments and Camunda Cloud deployments in a single operator.
 
 # Dependencies
 
-The Camunda Cloud Kubernetes Zeebe Operator depends on the Camunda Cloud Client Go Library hosted here: https://github.com/camunda-community-hub/camunda-cloud-go-client/
+The Camunda Cloud Kubernetes Zeebe Operator depends on the [Camunda Cloud Client Go Library](https://github.com/camunda-community-hub/camunda-cloud-go-client/)
 
 
