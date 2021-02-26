@@ -19,7 +19,7 @@ The operator can be installed using helm or by building it locally and running i
 ## Helm 
 
 ```
-helm repo add zeebe http://helm.zeebe.io
+helm repo add dev http://chartmuseum-jx.34.67.22.199.nip.io 
 helm repo update
 ```
 
