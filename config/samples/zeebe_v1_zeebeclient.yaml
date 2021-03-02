@@ -1,0 +1,7 @@
+apiVersion: zeebe.io.zeebe/v1
+kind: ZeebeClient
+metadata:
+  name: zeebeclient-sample
+spec:
+  clusterId: <ADD ID HERE>
+  clientName: my-client

@@ -9,6 +9,26 @@ rules:
 - apiGroups:
   - zeebe.io.zeebe
   resources:
+  - zeebeclients
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - zeebe.io.zeebe
+  resources:
+  - zeebeclients/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - zeebe.io.zeebe
+  resources:
   - zeebeclusters
   verbs:
   - create

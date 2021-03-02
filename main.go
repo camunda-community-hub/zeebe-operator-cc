@@ -17,12 +17,14 @@ package main
 
 import (
 	"flag"
-	cc "github.com/camunda-community-hub/camunda-cloud-go-client/pkg/cc/client"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"time"
 
+	cc "github.com/camunda-community-hub/camunda-cloud-go-client/pkg/cc/client"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"context"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -74,6 +76,13 @@ func main() {
 		Log:    ctrl.Log.WithName("controllers").WithName("ZeebeCluster"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ZeebeCluster")
+		os.Exit(1)
+	}
+	if err = (&controllers.ZeebeClientReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("ZeebeClient"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ZeebeClient")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder
