@@ -1,0 +1,48 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - zeebe.io.zeebe
+  resources:
+  - zeebeclients
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - zeebe.io.zeebe
+  resources:
+  - zeebeclients/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - zeebe.io.zeebe
+  resources:
+  - zeebeclusters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - zeebe.io.zeebe
+  resources:
+  - zeebeclusters/status
+  verbs:
+  - get
+  - patch
+  - update
