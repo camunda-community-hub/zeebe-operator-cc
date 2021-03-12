@@ -16,7 +16,6 @@ limitations under the License.
 package v1
 
 import (
-	cc "github.com/camunda-community-hub/camunda-cloud-go-client/pkg/cc/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -35,7 +34,7 @@ type ZeebeClientSpec struct {
 	// +kubebuilder:validation:Optional
 	SecretName string `json:"secretName"`
 	// +kubebuilder:validation:Optional
-	ZeebeClientDetails cc.ZeebeClientDetailsResponse `json:"zeebeClientDetails"`
+	ConfigMapName string `json:"configMapName"`
 }
 
 // ZeebeClientStatus defines the observed state of ZeebeClient

@@ -40,24 +40,10 @@ spec:
               type: string
             clusterId:
               type: string
+            configMapName:
+              type: string
             secretName:
               type: string
-            zeebeClientDetails:
-              properties:
-                ZEEBE_ADDRESS:
-                  type: string
-                ZEEBE_AUTHORIZATION_SERVER_URL:
-                  type: string
-                ZEEBE_CLIENT_ID:
-                  type: string
-                name:
-                  type: string
-              required:
-              - ZEEBE_ADDRESS
-              - ZEEBE_AUTHORIZATION_SERVER_URL
-              - ZEEBE_CLIENT_ID
-              - name
-              type: object
           required:
           - clientName
           - clusterId
