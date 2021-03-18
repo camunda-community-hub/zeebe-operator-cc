@@ -81,7 +81,7 @@ ingress:
 #      kubernetes.io/ingress.class: nginx
 
 serviceAccount:
-  enabled: true
+  enabled: false
   name: ""
   annotations: {}
 #  annotations:
