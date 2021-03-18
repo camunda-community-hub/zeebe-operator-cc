@@ -44,6 +44,8 @@ type ZeebeClusterStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.clusterStatus.ready"
+// +kubebuilder:printcolumn:name="CLUSTER ID",type="string",JSONPath=".spec.clusterId"
 // ZeebeCluster is the Schema for the zeebeclusters API
 type ZeebeCluster struct {
 	metav1.TypeMeta   `json:",inline"`

@@ -46,6 +46,7 @@ type ZeebeClientStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.status"
 // ZeebeClient is the Schema for the zeebeclients API
 type ZeebeClient struct {
 	metav1.TypeMeta   `json:",inline"`
