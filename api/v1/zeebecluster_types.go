@@ -35,7 +35,6 @@ type ZeebeClusterSpec struct {
 	ClusterId string `json:"clusterId"`
 	// +kubebuilder:validation:Optional
 	Region string `json:"region"`
-
 }
 
 // ZeebeClusterStatus defines the observed state of ZeebeCluster

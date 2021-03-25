@@ -127,9 +127,9 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	if zeebeCluster.Spec.ClusterId == "" && zeebeCluster.Spec.Owner != "CC" {
 		log.Info("Creating Cluster: " + zeebeCluster.Spec.ClusterId)
 		var clusterId = ""
-		if zeebeCluster.Spec.Region != ""{
+		if zeebeCluster.Spec.Region != "" {
 			clusterId, err = cc.CreateClusterInRegionDefault(req.NamespacedName.Name, zeebeCluster.Spec.Region)
-		}else{
+		} else {
 			clusterId, err = cc.CreateClusterDefault(req.NamespacedName.Name)
 		}
 		if err != nil {
