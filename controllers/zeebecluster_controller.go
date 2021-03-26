@@ -144,6 +144,29 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 
 	log.Info("Checking  for registering workers: ", "Cluster ID", zeebeCluster.Spec.ClusterId, " Tracking on: ", zeebeCluster.Spec.Track)
 	if zeebeCluster.Spec.ClusterId != "" {
+		name, err := cc.GetClusterByName(zeebeCluster.Name)
+		if err != nil {
+			log.Error(err, "failed to fetch cluster data")
+			return reconcile.Result{}, err
+		}
+		modified := false
+		if zeebeCluster.Spec.PlanName != name.Channel.Name {
+			zeebeCluster.Spec.PlanName = name.Channel.Name
+			modified = true
+		}
+		if zeebeCluster.Spec.GenerationName != name.Generation.Name{
+			zeebeCluster.Spec.GenerationName = name.Generation.Name
+			modified = true
+		}
+		if zeebeCluster.Spec.Region != name.K8sContext.Name{
+			zeebeCluster.Spec.Region = name.K8sContext.Name
+			modified = true
+		}
+		if modified{
+			if err := r.Update(context.Background(), &zeebeCluster); err != nil {
+				return reconcile.Result{}, err
+			}
+		}
 		log.Info("Registering worker to check cluster status: " + zeebeCluster.Spec.ClusterId)
 		go workerPollCCClusterDetails(zeebeCluster.Spec.ClusterId, r, zeebeCluster)
 	}

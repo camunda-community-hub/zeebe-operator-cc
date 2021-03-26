@@ -4,5 +4,5 @@ metadata:
   name: from-k8s 
 spec:
   region: "Europe West 1D"
-  generationName: "0.26.1"
   planName: "Development"
+  generationName: "0.26.1"
