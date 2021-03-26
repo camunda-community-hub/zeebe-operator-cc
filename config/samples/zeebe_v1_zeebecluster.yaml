@@ -3,5 +3,6 @@ kind: ZeebeCluster
 metadata:
   name: from-k8s 
 spec:
-  # Add fields here
-  foo: bar
+  region: "Europe West 1D"
+  generationName: "0.26.1"
+  planName: "Development"

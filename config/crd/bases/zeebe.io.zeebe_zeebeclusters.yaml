@@ -13,6 +13,15 @@ spec:
   - JSONPath: .spec.clusterId
     name: CLUSTER ID
     type: string
+  - JSONPath: .spec.region
+    name: REGION
+    type: string
+  - JSONPath: .spec.generationName
+    name: Generation
+    type: string
+  - JSONPath: .spec.planName
+    name: PLAN
+    type: string
   group: zeebe.io.zeebe
   names:
     kind: ZeebeCluster
@@ -43,9 +52,15 @@ spec:
           properties:
             clusterId:
               type: string
+            generationName:
+              type: string
             owner:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                 Important: Run "make" to regenerate code after modifying this file'
+              type: string
+            planName:
+              type: string
+            region:
               type: string
             track:
               type: boolean

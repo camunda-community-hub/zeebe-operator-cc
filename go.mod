@@ -3,7 +3,7 @@ module zeebe.io/m/v2
 go 1.15
 
 require (
-	github.com/camunda-community-hub/camunda-cloud-go-client v0.0.34
+	github.com/camunda-community-hub/camunda-cloud-go-client v0.0.35
 	github.com/go-logr/logr v0.1.0
 	github.com/google/go-cmp v0.3.0
 	github.com/onsi/ginkgo v1.8.0
