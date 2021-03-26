@@ -128,7 +128,7 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		log.Info("Creating Cluster: " + zeebeCluster.Spec.ClusterId)
 
 		clusterId, err := cc.CreateClusterWithParams(req.NamespacedName.Name,
-			zeebeCluster.Spec.Region, zeebeCluster.Spec.GenerationName, zeebeCluster.Spec.PlanName)
+			zeebeCluster.Spec.Region, zeebeCluster.Spec.ChannelName, zeebeCluster.Spec.PlanName)
 
 		if err != nil {
 			log.Error(err, "failed to create cluster")
@@ -154,8 +154,8 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 			zeebeCluster.Spec.PlanName = name.Channel.Name
 			modified = true
 		}
-		if zeebeCluster.Spec.GenerationName != name.Generation.Name{
-			zeebeCluster.Spec.GenerationName = name.Generation.Name
+		if zeebeCluster.Spec.ChannelName != name.Generation.Name{
+			zeebeCluster.Spec.ChannelName = name.Generation.Name
 			modified = true
 		}
 		if zeebeCluster.Spec.Region != name.K8sContext.Name{

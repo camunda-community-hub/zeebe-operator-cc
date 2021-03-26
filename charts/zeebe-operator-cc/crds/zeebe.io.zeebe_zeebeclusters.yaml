@@ -16,8 +16,8 @@ spec:
   - JSONPath: .spec.region
     name: REGION
     type: string
-  - JSONPath: .spec.generationName
-    name: Generation
+  - JSONPath: .spec.channelName
+    name: CHANNEL
     type: string
   - JSONPath: .spec.planName
     name: PLAN
@@ -50,9 +50,9 @@ spec:
         spec:
           description: ZeebeClusterSpec defines the desired state of ZeebeCluster
           properties:
-            clusterId:
+            channelName:
               type: string
-            generationName:
+            clusterId:
               type: string
             owner:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
