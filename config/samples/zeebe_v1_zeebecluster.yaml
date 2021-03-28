@@ -3,6 +3,7 @@ kind: ZeebeCluster
 metadata:
   name: from-k8s 
 spec:
-  region: "Europe West 1D"
   planName: "Development"
+  channelName: "Stable"
   generationName: "0.26.1"
+  region: "Europe West 1D"

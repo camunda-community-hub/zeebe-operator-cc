@@ -126,9 +126,8 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	log.Info("Checking Cluster ID for Creating Cluster Before Creation: " + zeebeCluster.Spec.ClusterId + "Owner : " + zeebeCluster.Spec.Owner)
 	if zeebeCluster.Spec.ClusterId == "" && zeebeCluster.Spec.Owner != "CC" {
 		log.Info("Creating Cluster: " + zeebeCluster.Spec.ClusterId)
-
-		clusterId, err := cc.CreateClusterWithParams(req.NamespacedName.Name,
-			zeebeCluster.Spec.Region, zeebeCluster.Spec.ChannelName, zeebeCluster.Spec.PlanName)
+		clusterId, err := cc.CreateClusterWithParams(req.NamespacedName.Name, zeebeCluster.Spec.PlanName,
+			 zeebeCluster.Spec.ChannelName, zeebeCluster.Spec.GenerationName,  zeebeCluster.Spec.Region)
 
 		if err != nil {
 			log.Error(err, "failed to create cluster")
@@ -150,12 +149,18 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 			return reconcile.Result{}, err
 		}
 		modified := false
-		if zeebeCluster.Spec.PlanName != name.Channel.Name {
-			zeebeCluster.Spec.PlanName = name.Channel.Name
+		if zeebeCluster.Spec.PlanName != name.ClusterPlantType.Name{
+			zeebeCluster.Spec.PlanName = name.ClusterPlantType.Name
 			modified = true
 		}
-		if zeebeCluster.Spec.ChannelName != name.Generation.Name{
-			zeebeCluster.Spec.ChannelName = name.Generation.Name
+
+		if zeebeCluster.Spec.GenerationName != name.Generation.Name{
+			zeebeCluster.Spec.GenerationName = name.Generation.Name
+			modified = true
+		}
+
+		if zeebeCluster.Spec.ChannelName != name.Channel.Name {
+			zeebeCluster.Spec.ChannelName = name.Channel.Name
 			modified = true
 		}
 		if zeebeCluster.Spec.Region != name.K8sContext.Name{

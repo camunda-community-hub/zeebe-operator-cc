@@ -38,6 +38,8 @@ type ZeebeClusterSpec struct {
 	// +kubebuilder:validation:Optional
 	ChannelName string `json:"channelName"`
 	// +kubebuilder:validation:Optional
+	GenerationName string `json:"generationName"`
+	// +kubebuilder:validation:Optional
 	PlanName string `json:"planName"`
 }
 
@@ -52,9 +54,10 @@ type ZeebeClusterStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.clusterStatus.ready"
 // +kubebuilder:printcolumn:name="CLUSTER ID",type="string",JSONPath=".spec.clusterId"
-// +kubebuilder:printcolumn:name="REGION",type="string",JSONPath=".spec.region"
-// +kubebuilder:printcolumn:name="CHANNEL",type="string",JSONPath=".spec.channelName"
 // +kubebuilder:printcolumn:name="PLAN",type="string",JSONPath=".spec.planName"
+// +kubebuilder:printcolumn:name="CHANNEL",type="string",JSONPath=".spec.channelName"
+// +kubebuilder:printcolumn:name="GENERATION",type="string",JSONPath=".spec.generationName"
+// +kubebuilder:printcolumn:name="REGION",type="string",JSONPath=".spec.region"
 // ZeebeCluster is the Schema for the zeebeclusters API
 type ZeebeCluster struct {
 	metav1.TypeMeta   `json:",inline"`
