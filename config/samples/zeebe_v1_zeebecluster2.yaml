@@ -1,0 +1,6 @@
+apiVersion: zeebe.io.zeebe/v1
+kind: ZeebeCluster
+metadata:
+  name: another
+spec:
+  planName: "Development"

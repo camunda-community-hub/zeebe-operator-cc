@@ -5,5 +5,4 @@ metadata:
 spec:
   planName: "Development"
   channelName: "Stable"
-  generationName: "0.26.1"
   region: "Europe West 1D"

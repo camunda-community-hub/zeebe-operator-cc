@@ -51,7 +51,7 @@ func (r *ZeebeClientReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		//log.Error(err, "Failed to get Zeebe Cluster")
 	}
 
-	if zeebeClient.Spec.ClusterId != "" && zeebeClient.Status == (zeebev1.ZeebeClientStatus{}) {
+	if zeebeClient.Spec.ClientId == "" && zeebeClient.Spec.ClusterId != "" && zeebeClient.Status == (zeebev1.ZeebeClientStatus{}) {
 		log.Info("Creating Zeebe Client for Cluster: " + zeebeClient.Spec.ClusterId + " and " + zeebeClient.Status.Status)
 
 		createdClientResponse, err := cc.CreateZeebeClient(zeebeClient.Spec.ClusterId, zeebeClient.Spec.ClientName)
