@@ -1,4 +1,7 @@
+Check that the CRDs had been installed with:
 
-Get the application URL by running these commands:
+> kubectl get crds
 
-kubectl get ingress {{ template "fullname" . }}
+Check that the operator is running with:
+
+> kubectl get pods

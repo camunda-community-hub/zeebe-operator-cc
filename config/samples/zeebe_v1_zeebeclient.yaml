@@ -3,5 +3,5 @@ kind: ZeebeClient
 metadata:
   name: zeebeclient-sample
 spec:
-  clusterId:
+  clusterId: 
   clientName: cc-client
