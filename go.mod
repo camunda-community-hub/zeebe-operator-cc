@@ -1,6 +1,6 @@
 module zeebe.io/m/v2
 
-go 1.16
+go 1.15
 
 require (
 	github.com/camunda-community-hub/camunda-cloud-go-client v0.0.44
