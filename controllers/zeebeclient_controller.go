@@ -17,7 +17,6 @@ package controllers
 
 import (
 	"context"
-	cc "github.com/camunda-community-hub/camunda-cloud-go-client/pkg/cc/client"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -54,7 +53,7 @@ func (r *ZeebeClientReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	if zeebeClient.Spec.ClientId == "" && zeebeClient.Spec.ClusterId != "" && zeebeClient.Status == (zeebev1.ZeebeClientStatus{}) {
 		log.Info("Creating Zeebe Client for Cluster: " + zeebeClient.Spec.ClusterId + " and " + zeebeClient.Status.Status)
 
-		createdClientResponse, err := cc.CreateZeebeClient(zeebeClient.Spec.ClusterId, zeebeClient.Spec.ClientName)
+		createdClientResponse, err := ccClient.CreateZeebeClient(zeebeClient.Spec.ClusterId, zeebeClient.Spec.ClientName)
 
 		if err != nil {
 			log.Error(err, "failed to create zeebe client for cluster: "+zeebeClient.Spec.ClusterId)
@@ -78,7 +77,7 @@ func (r *ZeebeClientReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 			log.Error(err, "Secret: "+zeebeClient.Spec.SecretName+" already exist and it was not updated")
 		}
 
-		details, err := cc.GetZeebeClientDetails(zeebeClient.Spec.ClusterId, createdClientResponse.ClientID)
+		details, err := ccClient.GetZeebeClientDetails(zeebeClient.Spec.ClusterId, createdClientResponse.ClientID)
 
 		objectMetaConfigMap := metav1.ObjectMeta{
 			Name:      zeebeClient.Spec.ConfigMapName,

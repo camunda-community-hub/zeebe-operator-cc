@@ -49,6 +49,7 @@ func init() {
 
 var clientId = os.Getenv("CC_CLIENT_ID")
 var clientSecret = os.Getenv("CC_CLIENT_SECRET")
+var ccClient cc.CCClient
 
 func main() {
 	var metricsAddr string
@@ -87,7 +88,7 @@ func main() {
 	}
 	// +kubebuilder:scaffold:builder
 	setupLog.Info("Attempting to login to Camunda Cloud ...")
-	var loginOk, errCC = cc.Login(clientId, clientSecret)
+	var loginOk, errCC = ccClient.Login(clientId, clientSecret)
 	if errCC != nil {
 		setupLog.Error(errCC, "Cannot connect to Camunda Cloud. Check CC_CLIENT_ID and CC_CLIENT_SECRET")
 		os.Exit(1)
@@ -96,7 +97,7 @@ func main() {
 		setupLog.Info("Logged in!")
 		//Getting available plans on startup.. then working with those for all requests
 		setupLog.Info("Retrieving Cluster Plans ...")
-		cc.GetClusterParams()
+		ccClient.GetClusterParams()
 		setupLog.Info("Retrieving Cluster Plans Done! ")
 
 		go workerPollCCClusters(mgr)
@@ -120,7 +121,7 @@ func workerPollCCClusters(mgr ctrl.Manager) {
 		select {
 		case <-ticker.C:
 
-			clusters, err := cc.GetClusters()
+			clusters, err := ccClient.GetClusters()
 			if err != nil {
 				setupLog.Error(err, "failed to get clusters")
 			}

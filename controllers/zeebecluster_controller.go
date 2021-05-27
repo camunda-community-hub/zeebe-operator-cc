@@ -38,11 +38,13 @@ const (
 	interval = 10 * time.Second
 )
 
+var ccClient cc.CCClient
+
 func (r *ZeebeClusterReconciler) WaitForClusterStateChange(clusterId string, currentStatus cc.ClusterStatus) (cc.ClusterStatus, error) {
 
 	wait.PollImmediateUntil(interval, func() (bool, error) {
 
-		resp, err := cc.GetClusterDetails(clusterId)
+		resp, err := ccClient.GetClusterDetails(clusterId)
 
 		if err != nil {
 
@@ -58,7 +60,7 @@ func (r *ZeebeClusterReconciler) WaitForClusterStateChange(clusterId string, cur
 		return true, nil
 
 	}, nil)
-	return cc.GetClusterDetails(clusterId)
+	return ccClient.GetClusterDetails(clusterId)
 
 }
 
@@ -126,8 +128,8 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	log.Info("Checking Cluster ID for Creating Cluster Before Creation: " + zeebeCluster.Spec.ClusterId + "Owner : " + zeebeCluster.Spec.Owner)
 	if zeebeCluster.Spec.ClusterId == "" && zeebeCluster.Spec.Owner != "CC" {
 		log.Info("Creating Cluster: " + zeebeCluster.Spec.ClusterId)
-		clusterId, err := cc.CreateClusterWithParams(req.NamespacedName.Name, zeebeCluster.Spec.PlanName,
-			 zeebeCluster.Spec.ChannelName, zeebeCluster.Spec.GenerationName,  zeebeCluster.Spec.Region)
+		clusterId, err := ccClient.CreateClusterWithParams(req.NamespacedName.Name, zeebeCluster.Spec.PlanName,
+			zeebeCluster.Spec.ChannelName, zeebeCluster.Spec.GenerationName, zeebeCluster.Spec.Region)
 
 		if err != nil {
 			log.Error(err, "failed to create cluster")
@@ -143,18 +145,18 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 
 	log.Info("Checking  for registering workers: ", "Cluster ID", zeebeCluster.Spec.ClusterId, " Tracking on: ", zeebeCluster.Spec.Track)
 	if zeebeCluster.Spec.ClusterId != "" {
-		name, err := cc.GetClusterByName(zeebeCluster.Name)
+		name, err := ccClient.GetClusterByName(zeebeCluster.Name)
 		if err != nil {
 			log.Error(err, "failed to fetch cluster data")
 			return reconcile.Result{}, err
 		}
 		modified := false
-		if zeebeCluster.Spec.PlanName != name.ClusterPlantType.Name{
+		if zeebeCluster.Spec.PlanName != name.ClusterPlantType.Name {
 			zeebeCluster.Spec.PlanName = name.ClusterPlantType.Name
 			modified = true
 		}
 
-		if zeebeCluster.Spec.GenerationName != name.Generation.Name{
+		if zeebeCluster.Spec.GenerationName != name.Generation.Name {
 			zeebeCluster.Spec.GenerationName = name.Generation.Name
 			modified = true
 		}
@@ -163,11 +165,11 @@ func (r *ZeebeClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 			zeebeCluster.Spec.ChannelName = name.Channel.Name
 			modified = true
 		}
-		if zeebeCluster.Spec.Region != name.K8sContext.Name{
-			zeebeCluster.Spec.Region = name.K8sContext.Name
+		if zeebeCluster.Spec.Region != name.ClusterPlantType.K8sContext.Name {
+			zeebeCluster.Spec.Region = name.ClusterPlantType.K8sContext.Name
 			modified = true
 		}
-		if modified{
+		if modified {
 			if err := r.Update(context.Background(), &zeebeCluster); err != nil {
 				return reconcile.Result{}, err
 			}
@@ -188,7 +190,7 @@ func workerPollCCClusterDetails(clusterId string, r *ZeebeClusterReconciler, zee
 	for {
 		select {
 		case <-ticker.C:
-			resp, err := cc.GetClusterDetails(clusterId)
+			resp, err := ccClient.GetClusterDetails(clusterId)
 			if err != nil {
 				r.Log.Error(err, "fetching cluster status details failed...")
 			}
@@ -223,7 +225,7 @@ func (r *ZeebeClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func (r *ZeebeClusterReconciler) deleteExternalDependency(zeebeCluster *zeebev1.ZeebeCluster) error {
 	log.Printf("Trying to delete the cluster in camunda cloud")
 	if zeebeCluster.Status.ClusterStatus.Ready != "Not Found" {
-		deleted, err := cc.DeleteCluster(zeebeCluster.Spec.ClusterId)
+		deleted, err := ccClient.DeleteCluster(zeebeCluster.Spec.ClusterId)
 		if err != nil {
 			log.Printf("Failed to delete cluster: cluster not found %s", err)
 		}
