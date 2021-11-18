@@ -6,4 +6,4 @@
 
 **This repository is no longer actively maintained.**
 
-* Please follow the instructions located at https://github.com/camunda-community-hub/zeebe-helm and https://github.com/camunda-community-hub/zeebe-helm-profiles to utilize Zeebe and Helm!
+* Please follow the instructions located at https://github.com/camunda-community-hub/camunda-cloud-helm to utilize Zeebe and Helm!
